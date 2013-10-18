@@ -88,9 +88,16 @@
 	$connection->db_connection();
 	$connection->selectDb();
 	
+	
 	foreach ($response as $key => $value) {
+		// var_dump($value->user->id);
+		// die();
+		$tweet_created = strtotime($value->created_at);
+		$user_id = $value->user->id;
+		$id = $value->id;
 		$str = $value->text;
 		$pattern = "/(#\w+)/";
+
 		preg_match_all($pattern, $str, $matches, PREG_PATTERN_ORDER);
 		$matches = $matches[1];
 
@@ -112,7 +119,6 @@
 			$str = preg_replace('/#([\w-]+)/i', '', $str); // #someone
 			$str = preg_replace('/@([\w-]+)/i', '', $str); // @tag
 			$str = preg_replace('/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', '', $str); //url
-			echo "<li>" . $str . '</li>';
 
 			$result = preg_split('/(?<=\d)(?=[a-z])|(?<=[a-z])(?=\d)/i', $str);
 			preg_match_all('/\d+|[a-z]+/i', $str, $result);
@@ -120,7 +126,7 @@
 
 			$answer_valid = false;
 			$result = array_unique($result);
-			
+			// var_dump($result);
 			$alphabet = array();
 			$ranking = array();
 
@@ -192,9 +198,11 @@
 					}
 
 					$stm = "INSERT INTO response " . $answer_header ." VALUES " . $answer;
-					// $res = $connection->createQuery($stm);
-					echo "string";
-					// if (! $res) {
+					//$res = $connection->createQuery($stm);
+					var_dump($user_id);
+					var_dump($tweet_created);
+					// var_dump($id);
+					// if ($res) {
 					// 	echo "Answer inserted";
 					// }
 				}
