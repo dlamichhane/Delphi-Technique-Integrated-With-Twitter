@@ -76,7 +76,7 @@
 	/** Note: Set the GET field BEFORE calling buildOauth(); **/
 	$url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
 	// $url = 'https://api.twitter.com/1.1/search/tweets.json';
-	$getfield = '?screen_name=delphi_head&count=800';
+	$getfield = '?screen_name=delphi_head&count=800&optional=true';
 	// $getfield = '?q=#Options_Q1&result_type=recent';
 	$requestMethod = 'GET';
 	$twitter = new TwitterAPIExchange($settings);
@@ -88,13 +88,13 @@
 	$connection->db_connection();
 	$connection->selectDb();
 	
-	
+	$a = array();
 	foreach ($response as $key => $value) {
-		// var_dump($value->user->id);
-		// die();
+		
 		$tweet_created = strtotime($value->created_at);
 		$user_id = $value->user->id;
-		$id = $value->id;
+		$tweet_id = $value->id;
+		
 		$str = $value->text;
 		$pattern = "/(#\w+)/";
 
@@ -126,7 +126,9 @@
 
 			$answer_valid = false;
 			$result = array_unique($result);
+			
 			// var_dump($result);
+
 			$alphabet = array();
 			$ranking = array();
 
@@ -147,6 +149,29 @@
 				}
 
 				if ($answer_valid) {
+					$tag = explode('_', $value->entities->hashtags[0]->text);
+
+					if ($tag[1] == "code") {
+						$question_code = "#". $value->entities->hashtags[0]->text;
+					} else if ($tag[1] == 'answer') {
+						$answer_code = "#". $value->entities->hashtags[0]->text;
+					}
+
+					$tag = explode('_', $value->entities->hashtags[1]->text);
+
+					if ($tag[1] == "code") {
+						$question_code = "#". $value->entities->hashtags[1]->text;
+					} else if ($tag[1] == 'answer') {
+						$answer_code = "#". $value->entities->hashtags[1]->text;
+					}
+
+					//$stm = "SELECT user_id FROM response WHERE user_id=". $user_id ." AND tweet_created=";
+					// $a[$user_id] = array(
+					// 	'user_id' => $user_id,
+					// 	'tweet_created' => $tweet_created,
+					// 	'tweet_id' => $tweet_id
+					// );
+
 
 					$answer = "(";
 					$answer_header = "(";
@@ -189,8 +214,8 @@
 						}
 
 						if ($last_index == $idx) {
-							$answer_header .= ')';
-							$answer .= ')';	
+							$answer_header .= ', created, expert_id, question_code, answer_code)';
+							$answer .= ', ' . $tweet_created .', ' . $user_id. ', ' . $question_code . ', ' . $answer_code. ')';	
 						} else {
 							$answer_header .= ', ';
 							$answer .= ', ';	
@@ -198,9 +223,10 @@
 					}
 
 					$stm = "INSERT INTO response " . $answer_header ." VALUES " . $answer;
+					var_dump($stm);
 					//$res = $connection->createQuery($stm);
-					var_dump($user_id);
-					var_dump($tweet_created);
+					// var_dump($user_id);
+					// var_dump($tweet_created);
 					// var_dump($id);
 					// if ($res) {
 					// 	echo "Answer inserted";
@@ -211,7 +237,7 @@
 		}
 
 	}
-	
+
 
 ?>
 
