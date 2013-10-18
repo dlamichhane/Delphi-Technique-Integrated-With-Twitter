@@ -76,25 +76,134 @@
 	/** Note: Set the GET field BEFORE calling buildOauth(); **/
 	$url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
 	// $url = 'https://api.twitter.com/1.1/search/tweets.json';
-	$getfield = '?screen_name=delphi_head';
-	// $getfield = '?q=#vaasa_oulu_delphi&result_type=recent';
+	$getfield = '?screen_name=delphi_head&count=800';
+	// $getfield = '?q=#Options_Q1&result_type=recent';
 	$requestMethod = 'GET';
 	$twitter = new TwitterAPIExchange($settings);
-	// $response = json_decode($twitter->setGetfield($getfield)
-	//              					->buildOauth($url, $requestMethod)
-	//              					->performRequest());
-	// $response = $twitter->setGetfield($getfield)
-	//              					->buildOauth($url, $requestMethod)
-	//              					->performRequest();
+	$response = json_decode($twitter->setGetfield($getfield)
+	             					->buildOauth($url, $requestMethod)
+	             					->performRequest());
 	
-	// var_dump($response);
-	// echo "<ul>";
-	// foreach ($response as $key => $value) {
-	// 	echo "<li>" . $value->text . '</li>';
-	// }
-	// echo "</ul>";
+	$connection = new DBConnection();
+	$connection->db_connection();
+	$connection->selectDb();
+	
+	foreach ($response as $key => $value) {
+		$str = $value->text;
+		$pattern = "/(#\w+)/";
+		preg_match_all($pattern, $str, $matches, PREG_PATTERN_ORDER);
+		$matches = $matches[1];
+
+		$check_array = array('#Q1_code', "#Q1_answer");
+
+		$exist = false;
+
+		foreach ($check_array as $k => $v) {
+			if (in_array($v, $matches)) {
+				$exist = true;
+			} else {
+				$exist = false;
+				break;
+			}
+
+		}
+
+		if ($exist) {
+			$str = preg_replace('/#([\w-]+)/i', '', $str); // #someone
+			$str = preg_replace('/@([\w-]+)/i', '', $str); // @tag
+			$str = preg_replace('/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', '', $str); //url
+			echo "<li>" . $str . '</li>';
+
+			$result = preg_split('/(?<=\d)(?=[a-z])|(?<=[a-z])(?=\d)/i', $str);
+			preg_match_all('/\d+|[a-z]+/i', $str, $result);
+			$result = $result[0];
+
+			$answer_valid = false;
+			$result = array_unique($result);
+			
+			$alphabet = array();
+			$ranking = array();
+
+			if (count($result) == 14) {
+				/* Seperate answer into two arrays */
+				$i = 0;
+				do {
+				    array_push($alphabet, $result[$i]);
+				    array_push($ranking, $result[$i + 1]);
+				    $i = $i + 2;
+				} while ($i < count($result));
+				
+				$tmp_alphabet = $alphabet;
+				$tmp_ranking = $ranking;
+
+				if (sort($tmp_alphabet) == array('A', 'B', 'C', 'D', 'E', 'F', 'G') && sort($tmp_ranking) == array('1', '2', '3', '4', '5', '6', '7')) {
+					$answer_valid = true;
+				}
+
+				if ($answer_valid) {
+
+					$answer = "(";
+					$answer_header = "(";
+					end($ranking);
+					$last_index = key($ranking);
+					
+					$result= array_chunk($result,2);
+
+					foreach ($result as $idx => $val) {
+
+						switch ($val[0]) {
+							case 'A':
+								$answer_header .= "answer_1";
+								$answer .= "'" . $val[1] . "'";
+								break;
+							case 'B':
+								$answer_header .= "answer_2";
+								$answer .= "'" . $val[1] . "'";
+								break;
+							case 'C':
+								$answer_header .= "answer_3";
+								$answer .= "'" . $val[1] . "'";
+								break;
+							case 'D':
+								$answer_header .= "answer_4";
+								$answer .= "'" . $val[1] . "'";
+								break;
+							case 'E':
+								$answer_header .= "answer_5";
+								$answer .= "'" . $val[1] . "'";
+								break;
+							case 'F':
+								$answer_header .= "answer_6";
+								$answer .= "'" . $val[1] . "'";
+								break;
+							case 'G':
+								$answer_header .= "answer_7";
+								$answer .= "'" . $val[1] . "'";
+								break;
+						}
+
+						if ($last_index == $idx) {
+							$answer_header .= ')';
+							$answer .= ')';	
+						} else {
+							$answer_header .= ', ';
+							$answer .= ', ';	
+						}
+					}
+
+					$stm = "INSERT INTO response " . $answer_header ." VALUES " . $answer;
+					// $res = $connection->createQuery($stm);
+					echo "string";
+					// if (! $res) {
+					// 	echo "Answer inserted";
+					// }
+				}
+			}
+			
+		}
+
+	}
 	
 
-	
 ?>
 
