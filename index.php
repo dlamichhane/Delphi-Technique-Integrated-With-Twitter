@@ -9,7 +9,7 @@
 		<title>Delphi technique using social media</title>
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-responsive.css">
-		<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+		<!--<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> -->
 		<script src="bootstrap/js/bootstrap.js"></script>
 		<script src="bootstrap/js/application.js"></script>
 	</head>
@@ -76,7 +76,7 @@
 	/** Note: Set the GET field BEFORE calling buildOauth(); **/
 	$url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
 	// $url = 'https://api.twitter.com/1.1/search/tweets.json';
-	$getfield = '?screen_name=delphi_head&count=800&optional=true';
+	$getfield = '?screen_name=delphi_head&count=100&optional=true';
 	// $getfield = '?q=#Options_Q1&result_type=recent';
 	$requestMethod = 'GET';
 	$twitter = new TwitterAPIExchange($settings);
@@ -88,10 +88,10 @@
 	$connection->db_connection();
 	$connection->selectDb();
 	
-	$a = array();
+	// $a = array();	
 	foreach ($response as $key => $value) {
 		
-		$tweet_created = strtotime($value->created_at);
+		$tweet_created = date('Y-m-d H:i:s',strtotime($value->created_at));
 		$user_id = $value->user->id;
 		$tweet_id = $value->id;
 		
@@ -127,8 +127,6 @@
 			$answer_valid = false;
 			$result = array_unique($result);
 			
-			// var_dump($result);
-
 			$alphabet = array();
 			$ranking = array();
 
@@ -165,79 +163,129 @@
 						$answer_code = "#". $value->entities->hashtags[1]->text;
 					}
 
-					//$stm = "SELECT user_id FROM response WHERE user_id=". $user_id ." AND tweet_created=";
-					// $a[$user_id] = array(
-					// 	'user_id' => $user_id,
-					// 	'tweet_created' => $tweet_created,
-					// 	'tweet_id' => $tweet_id
-					// );
+					$stm = "SELECT tweet_created, modified_count FROM response WHERE expert_id='". $user_id ."' AND question_code='" . $question_code. "' AND answer_code='" . $answer_code ."'";
+					$rs = $connection->selectQuery($stm);
 
+					$query_type = 'insert';
 
-					$answer = "(";
-					$answer_header = "(";
-					end($ranking);
-					$last_index = key($ranking);
-					
-					$result= array_chunk($result,2);
-
-					foreach ($result as $idx => $val) {
-
-						switch ($val[0]) {
-							case 'A':
-								$answer_header .= "answer_1";
-								$answer .= "'" . $val[1] . "'";
-								break;
-							case 'B':
-								$answer_header .= "answer_2";
-								$answer .= "'" . $val[1] . "'";
-								break;
-							case 'C':
-								$answer_header .= "answer_3";
-								$answer .= "'" . $val[1] . "'";
-								break;
-							case 'D':
-								$answer_header .= "answer_4";
-								$answer .= "'" . $val[1] . "'";
-								break;
-							case 'E':
-								$answer_header .= "answer_5";
-								$answer .= "'" . $val[1] . "'";
-								break;
-							case 'F':
-								$answer_header .= "answer_6";
-								$answer .= "'" . $val[1] . "'";
-								break;
-							case 'G':
-								$answer_header .= "answer_7";
-								$answer .= "'" . $val[1] . "'";
-								break;
-						}
-
-						if ($last_index == $idx) {
-							$answer_header .= ', created, expert_id, question_code, answer_code)';
-							$answer .= ', ' . $tweet_created .', ' . $user_id. ', ' . $question_code . ', ' . $answer_code. ')';	
-						} else {
-							$answer_header .= ', ';
-							$answer .= ', ';	
+					if (! empty($rs)) {
+						if (strtotime($rs['tweet_created']) < strtotime($value->created_at)) {
+							$query_type = 'update';
+						} else if (strtotime($rs['tweet_created']) >= strtotime($value->created_at)) {
+							$query_type = "";
 						}
 					}
 
-					$stm = "INSERT INTO response " . $answer_header ." VALUES " . $answer;
-					var_dump($stm);
-					//$res = $connection->createQuery($stm);
-					// var_dump($user_id);
-					// var_dump($tweet_created);
-					// var_dump($id);
-					// if ($res) {
-					// 	echo "Answer inserted";
-					// }
+					// $a[$key] = array(
+     //                                'user_id' => $user_id,
+     //                                'tweet_created' => $tweet_created,
+     //                                'tweet_id' => $tweet_id
+     //                        );
+					
+					if ($query_type == 'update') {
+						$query_sub_stm = "";
+
+						$query_sub_stm .= "tweet_created='" . $tweet_created . "',";
+						$query_sub_stm .= "updated='" . date('Y-m-d H:i:s') . "',";
+						$query_sub_stm .= "modified_count='" . ($rs['modified_count'] + 1)."'";
+						
+						$result= array_chunk($result,2);
+						end($result);
+						$last_index = key($result);
+
+						foreach ($result as $idx => $val) {
+						
+							switch ($val[0]) {
+								case 'A':
+									$query_sub_stm .= ", answer_1= '" . $val[1] . "'";
+									break;
+								case 'B':
+									$query_sub_stm .= ", answer_2= '" . $val[1] . "'";
+									break;
+								case 'C':
+									$query_sub_stm .= ", answer_3= '" . $val[1] . "'";
+									break;
+								case 'D':
+									$query_sub_stm .= ", answer_4= '" . $val[1] . "'";
+									break;
+								case 'E':
+									$query_sub_stm .= ", answer_5= '" . $val[1] . "'";
+									break;
+								case 'F':
+									$query_sub_stm .= ", answer_6= '" . $val[1] . "'";
+									break;
+								case 'G':
+									$query_sub_stm .= ", answer_7= '" . $val[1] . "'";
+									break;
+							}
+						}						
+
+						$stm = "UPDATE response SET " . $query_sub_stm . " WHERE expert_id='" . $user_id . "' AND question_code='" . $question_code . "' AND answer_code='" . $answer_code . "'";
+						$res = $connection->createQuery($stm);
+						if ($res) {
+							echo "Answer updated";
+						}
+
+					} else if ($query_type == 'insert') {
+						$answer = "(";
+						$answer_header = "(";
+						
+						$result= array_chunk($result,2);
+						end($result);
+						$last_index = key($result);
+
+						foreach ($result as $idx => $val) {
+
+							switch ($val[0]) {
+								case 'A':
+									$answer_header .= "answer_1";
+									$answer .= "'" . $val[1] . "'";
+									break;
+								case 'B':
+									$answer_header .= "answer_2";
+									$answer .= "'" . $val[1] . "'";
+									break;
+								case 'C':
+									$answer_header .= "answer_3";
+									$answer .= "'" . $val[1] . "'";
+									break;
+								case 'D':
+									$answer_header .= "answer_4";
+									$answer .= "'" . $val[1] . "'";
+									break;
+								case 'E':
+									$answer_header .= "answer_5";
+									$answer .= "'" . $val[1] . "'";
+									break;
+								case 'F':
+									$answer_header .= "answer_6";
+									$answer .= "'" . $val[1] . "'";
+									break;
+								case 'G':
+									$answer_header .= "answer_7";
+									$answer .= "'" . $val[1] . "'";
+									break;
+							}
+
+							if ($last_index == $idx) {
+								$answer_header .= ', tweet_created, expert_id, question_code, answer_code, modified_count, created)';
+								$answer .= ", '" . $tweet_created ."', '" . $user_id. "', '" . $question_code . "', '" . $answer_code. "', '1', '" . date('Y-m-d H:i:s') . "')";	
+							} else {
+								$answer_header .= ', ';
+								$answer .= ', ';	
+							}
+						}
+
+						$stm = "INSERT INTO response " . $answer_header ." VALUES " . $answer;
+						$res = $connection->createQuery($stm);
+						if ($res) {
+							echo "Answer inserted";
+						}
+					}
 				}
 			}
-			
 		}
-
 	}
-
-
+	// var_dump($a);
 ?>
 

@@ -10,7 +10,6 @@
 		$question = substr($_POST['question'], 0, 140);
 
 		if (substr($_POST['question_code'], 0, 1) != "#") {
-			echo "string";
 			$_SESSION["error"] = "No hashtag in the question_code for e.g. #question_code";
 			header("Location: " . ADMIN_BASE_PATH . "/questions.php");
 		}
