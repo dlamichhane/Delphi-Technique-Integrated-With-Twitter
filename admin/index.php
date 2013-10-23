@@ -30,7 +30,8 @@
 				?>
 				<h2 class="form-signin-heading">Navigation</h2>
 				<a class="btn btn-large btn-primary" href="questions.php">Prepare questions</a> <br><br>
-				<a class="btn btn-large btn-primary" href="results.php">View results</a>
+				<a class="btn btn-large btn-primary" href="preprocessor.php">Preprocessor</a> <br><br>
+				<a class="btn btn-large btn-primary" href="results.php">Results</a>
 			</form>
 		</div>		
 	</body>

@@ -35,13 +35,7 @@
 	require_once('db.class.php');
 	
 	require_once('twitter/TwitterAPIExchange.php');
-	/* Localhost access token and secret key */
-
-	define("ACCESS_TOKEN", "1931901835-yt9Gmg8SoyvqwbKg1bBVD9kNi6UBMoP3BITLyyc");
-	define("ACCESS_TOKEN_SECRET", "R90T0KsHzIC4Nd31jwT37PSSsP2CLZm6qPOLbgSFY4");
-	define("CONSUMER_KEY", "UpjOaNLQxBs1TdLHRbEbPA");
-	define("CONSUMER_SECRET", "tn7tL66w0kzzROqyqJtXq6gXnbJ8L0rB3efVEh3DM");
-
+	
 	/** Set access tokens here - see: https://dev.twitter.com/apps/ **/
 	$settings = array(
 	    'oauth_access_token' => ACCESS_TOKEN,
@@ -75,9 +69,7 @@
 	/** Perform a GET request and echo the response **/
 	/** Note: Set the GET field BEFORE calling buildOauth(); **/
 	$url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
-	// $url = 'https://api.twitter.com/1.1/search/tweets.json';
-	$getfield = '?screen_name=delphi_head&count=100&optional=true';
-	// $getfield = '?q=#Options_Q1&result_type=recent';
+	$getfield = '?screen_name=delphi_head&count=800&optional=true';
 	$requestMethod = 'GET';
 	$twitter = new TwitterAPIExchange($settings);
 	$response = json_decode($twitter->setGetfield($getfield)
@@ -88,7 +80,14 @@
 	$connection->db_connection();
 	$connection->selectDb();
 	
-	// $a = array();	
+	$a = array();
+	// echo "<ul>";
+	foreach ($response as $key => $value) {
+		var_dump($value);
+		// echo "<li>" . $value->user->id . " - ". date('Y-m-d H:i:s',strtotime($value->created_at)) . " - ". $value->text ."</li>";
+	}
+	// echo "</ul>";
+	die();	
 	foreach ($response as $key => $value) {
 		
 		$tweet_created = date('Y-m-d H:i:s',strtotime($value->created_at));
@@ -176,11 +175,11 @@
 						}
 					}
 
-					// $a[$key] = array(
-     //                                'user_id' => $user_id,
-     //                                'tweet_created' => $tweet_created,
-     //                                'tweet_id' => $tweet_id
-     //                        );
+					$a[$key] = array(
+                                    'user_id' => $user_id,
+                                    'tweet_created' => $tweet_created,
+                                    'tweet_id' => $tweet_id
+                            );
 					
 					if ($query_type == 'update') {
 						$query_sub_stm = "";
@@ -286,6 +285,6 @@
 			}
 		}
 	}
-	// var_dump($a);
+	var_dump($a);
 ?>
 

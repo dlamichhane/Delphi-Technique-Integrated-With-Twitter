@@ -83,7 +83,6 @@
 			$result = $connection->selectQuery($stm);
 			$connection->closeConnection();
 			$open_hidden = true;
-			// var_dump($result);
 		}
 ?>
 
