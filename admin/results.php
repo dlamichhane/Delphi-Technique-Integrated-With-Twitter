@@ -121,10 +121,33 @@
 					</ul>
 				</div>
 				<div class="span9">
-					<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto">
-						<span class="label label-info"><h4>Choose question and round to view the graph </h4></span>
-					</div>
-					<table class="table table-striped"></table>
+					<table class="table">
+						<thead>
+							<tr>
+								<th style="text-align:center;"><span class="label label-important">Choose question and round to view the graph</span></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto">
+										
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="coefficient" style="min-width: 310px; height: 400px; margin: 0 auto">
+									
+									</div>
+								</td>
+							</tr>
+							
+						</tbody>
+					</table>
+					
+					
+					
 				</div>
 				
 			</div>

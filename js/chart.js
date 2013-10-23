@@ -13,7 +13,8 @@ $(function () {
 				data: data,
 				success: function (responseData) {
 					try {
-						var obj = jQuery.parseJSON(responseData);	
+						var obj = jQuery.parseJSON(responseData);
+						// console.log(jQuery.parseJSON(obj[0]));	
 					} catch(e) {
 						alert('Invalid JSON');
 					}
@@ -21,7 +22,7 @@ $(function () {
 					categories = [];
 					data = [];
 
-					$.each(obj, function(key, val) {
+					$.each(jQuery.parseJSON(obj[0]), function(key, val) {
 						categories.push(key);
 						data.push(parseFloat(val));
 					});
@@ -49,7 +50,56 @@ $(function () {
 				            }
 				        },
 				        series: [{
-				            name: 'Response',
+				            name: 'Mean response',
+				            data: data,
+				            dataLabels: {
+			                    enabled: true,
+			                    rotation: -90,
+			                    color: '#FFFFFF',
+			                    align: 'right',
+			                    x: 4,
+			                    y: 10,
+			                    style: {
+			                        fontSize: '13px',
+			                        fontFamily: 'Verdana, sans-serif',
+			                        textShadow: '0 0 3px black'
+			                    }
+			                }
+				        }]
+				    });
+
+					categories = [];
+					data = [];
+
+					$.each(jQuery.parseJSON(obj[1]), function(key, val) {
+						categories.push(key);
+						data.push(parseFloat(val));
+					});
+
+					$('#coefficient').highcharts({
+				        chart: {
+				            type: 'column'
+				        },
+				        title: {
+				            text: question_val + " "+ round_val + ' Coefficient of variation'
+				        },
+				        xAxis: {
+				            categories: categories
+				        },
+				        yAxis: {
+				            min: 0,
+				            title: {
+				                text: 'Coefficient of variation value'
+				            }
+				        },
+				        plotOptions: {
+				            column: {
+				                pointPadding: 0.2,
+				                borderWidth: 0
+				            }
+				        },
+				        series: [{
+				            name: 'Coefficient of variation of response ',
 				            data: data,
 				            dataLabels: {
 			                    enabled: true,

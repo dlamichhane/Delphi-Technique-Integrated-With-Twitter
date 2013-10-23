@@ -6,19 +6,19 @@
 		header("Location: " . ADMIN_BASE_PATH . "/login.php");
 	}
 
-	if (isset($_POST['question']) && isset($_POST['round'])) {
+	// if (isset($_POST['question']) && isset($_POST['round'])) {
 		require_once '../db.class.php';
 
 		$connection = new DBConnection();
 		$connection->db_connection();
 		$connection->selectDb();
 
-		$question = "#" . $_POST['question'] . "_code";
-		$round = "#" . $_POST['round']. "_answer";
-		// $question = "#Q1_code";
-		// $round = "#R1_answer";
-		$result_code = $_POST['question'] . "_" . $_POST['round'];
-		// $result_code = "Q1_R1";
+		// $question = "#" . $_POST['question'] . "_code";
+		// $round = "#" . $_POST['round']. "_answer";
+		$question = "#Q1_code";
+		$round = "#R1_answer";
+		// $result_code = $_POST['question'] . "_" . $_POST['round'];
+		$result_code = "Q1_R1";
 		
 		$stm = "SELECT 	SUM(answer_1) / COUNT(answer_1) AS option_1, SUM(answer_2) / COUNT(answer_2) AS option_2,
 						SUM(answer_3) / COUNT(answer_3) AS option_3, SUM(answer_4) / COUNT(answer_4) AS option_4,
@@ -137,12 +137,24 @@
 			foreach ($rs as $option_key => $mean) {
 				foreach ($standard_deviation as $option_k => $sd) {
 					if ($option_key == $option_k) {
-						$coefficient_of_variation[$option_k] = ($sd/$mean);	
+						$coefficient_of_variation[$option_k] = round(($sd/$mean), 4);	
 					}
 				}
 			}	
 		}
 		
+		$coff_var = array();
+		foreach ($coefficient_of_variation as $key => $value) {
+			if (! empty($value)) {
+				foreach ($rs1 as $k => $v) {
+					if ($key == $k) {
+						$coff_var[$v] = $value;
+					}
+				}	
+			}
+		}
+
+		// echo json_encode($coff_var);
 		$id = $connection->selectQuery("SELECT id FROM results WHERE result_code='" . $result_code . "'");
 		
 		if (empty($id)) {
@@ -211,11 +223,13 @@
 			$stm = "UPDATE results SET " . $sub_stm . " WHERE id = " . $id['id'] . " AND result_code = '" . $result_code . "'";
 			$connection->createQuery($stm);
 		}
-		// $response = array();
-		// array_push($new_rs, var)
-		echo json_encode($new_rs);	
+		
+		$response = array();
+		array_push($response, json_encode($new_rs));
+		array_push($response, json_encode($coff_var));
+		echo json_encode($response);
 		exit();
-	}
+	// }
 
 
 
