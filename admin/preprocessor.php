@@ -36,6 +36,17 @@
 	<body>
 		<div class="container">
 			<a href="<?php echo ADMIN_BASE_PATH ?>/index.php"> Back to navigation</a>
+
+			<div class="row-fluid">
+				<div class="span12">
+					<ul style="text-align:center;list-style-type:none;">
+						<li><span class="label label-info">NOTE!!! Respective hashtag should be used to reply the answer in each round</span></li>
+						<li><span class="label label-info">Round 1 => #R1_answer</span></li>
+						<li><span class="label label-info">Round 2 => #R2_answer</span></li>
+						<li><span class="label label-info">Round 3 => #R3_answer</span></li>
+					</ul>
+				</div>
+			</div>
 			<?php
 
 				if (isset($_GET['question']) && isset($_GET['round'])) {
@@ -273,38 +284,25 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>1</td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q1_code&round=R1_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q1_code&round=R2_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q1_code&round=R3_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?comments=Q1_comments">Fetch comments</a></td>
-						<td>#Prepare_questions</td>
-					</tr>
-					<tr>
-						<td>2</td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q2_code&round=R1_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q2_code&round=R2_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q2_code&round=R3_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?comments=Q2_comments">Fetch comments</a></td>
-						<td>Not started</td>
-					</tr>
-					<tr>
-						<td>3</td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q3_code&round=R1_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q3_code&round=R2_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q3_code&round=R3_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?comments=Q1_comments">Fetch comments</a></td>
-						<td>Not started</td>
-					</tr>
-					<tr>
-						<td>4</td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q4_code&round=R1_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q4_code&round=R2_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=Q4_code&round=R3_answer">Fetch response</a></td>
-						<td><a class="btn btn-large btn-primary" href="preprocessor.php?comments=Q4_comments">Fetch comments</a></td>
-						<td>Not started</td>
-					</tr>
+					<?php
+						$connection = new DBConnection();
+						$connection->db_connection();
+						$connection->selectDb();
+						$stm = "SELECT * FROM questions";
+						$rs = $connection->selectQuery($stm);
+						// var_dump($rs);
+						foreach ($rs as $key => $value) {
+							$res_str = '<tr>';
+							$res_str .=	'<td>' . ($key + 1).'</td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . $value['question_code'] . '&round=R1_answer">Fetch response</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . $value['question_code'] . '&round=R2_answer">Fetch response</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . $value['question_code'] . '&round=R3_answer">Fetch response</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?comments=Q1_comments">Fetch comments</a></td>';
+							$res_str .=	'<td>#Prepare_questions</td>';
+							$res_str .= '</tr>';
+							echo $res_str;
+						}
+					?>
 				</tbody>
 			</table>
 		</div>		

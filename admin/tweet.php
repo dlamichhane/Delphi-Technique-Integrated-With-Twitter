@@ -25,7 +25,7 @@
 
 	if (isset($_GET['action']) && $_GET['action'] == 'tweet_q' && isset($_GET['question']) && ! empty($_GET['question'])) {
 		
-		$stm = "SELECT question_code, questions FROM questions WHERE id = " . $_GET['question'];
+		$stm = "SELECT question_code, questions, question_tweet_count FROM questions WHERE id = " . $_GET['question'];
 		$connection = new DBConnection();
 		$connection->db_connection();
 		$connection->selectDb();
@@ -43,9 +43,21 @@
 
 		/** Perform a POST request and echo the response **/
 		$twitter = new TwitterAPIExchange($settings);
-		$twitter->buildOauth($url, $requestMethod)
+		$response = $twitter->buildOauth($url, $requestMethod)
 		             ->setPostfields($postfields)
 		             ->performRequest();
+		$response = json_decode($response);
+
+		if ($response->errors[0]->code == '187') {
+			$_SESSION['tweet_fail'] = $response->errors[0]->message . " Wait sometimes to tweet the message.";
+		}
+
+		if (! empty($response->id)) {
+			$question_tweet_count = $result['question_tweet_count'] + 1;
+			$stm = "UPDATE questions SET question_tweet_count=" . $question_tweet_count . " WHERE id=" . $_GET['question'];
+			$connection->createQuery($stm);
+		}
+		
 		header("Location: " . ADMIN_BASE_PATH . "/questions.php");
 		exit();
 	}
