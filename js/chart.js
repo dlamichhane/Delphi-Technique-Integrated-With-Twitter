@@ -2,11 +2,47 @@ $(function () {
 	$('#show_graph').click(function () {
 		question_val = $('select[name=question] option:selected').val();
 		round_val = $('select[name=round] option:selected').val();
+		result_type = $('select[name=result_type] option:selected').val();
+
+		if (question_val == 0) {
+			alert('Select question');
+			return false;
+		}
+
+		if (round_val == 0) {
+			alert('Select appropriate Delphi round');
+			return false;
+		}
+
+		if (result_type == 0) {
+			alert('Select result type');
+			return false;
+		}
+
 		data = {};
 		data['question'] = question_val;
 		data['round'] = round_val;
+		data['result_type'] = result_type;
 
-		if (question_val != '0' && round_val != '0') {
+		if (result_type == "comments") {
+			if (question_val !=0 && round_val != 'R3') {
+				alert('Comments are only available for round three');
+				return false;
+			}
+			
+			$.ajax({
+				url: '../admin/proxy.php',
+				type: 'POST',
+				data: data,
+				success: function(responseData) {
+					$("#container").html(responseData);
+					$('.highcharts-container').remove();
+				}
+			});
+			return true;
+		}
+
+		if (question_val != '0' && round_val != '0' && result_type == "graph") {
 			$.ajax({
 				url: '../admin/proxy.php',
 				type: 'POST',

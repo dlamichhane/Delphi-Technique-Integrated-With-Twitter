@@ -39,7 +39,7 @@
 			<div class="row-fluid">
 				<div class="span3">
 					<ul class="nav nav-list"><li class="divider"></li>
-						<li class="nav-header">View and save graph</li>
+						<li class="nav-header">View graph and comments</li>
 						<li class="divider"></li>
 						<li>
 							<select name="question">
@@ -59,6 +59,14 @@
 							</select>
 									
 						</li>
+						<li>
+							<select name="result_type">
+								<option value="0">Choose result type</option>
+								<option value="graph">Graph</option>
+								<option value="comments">Comments</option>
+							</select>
+						</li>
+
 						<li>
 							<button class="btn btn-primary btn-small" id="show_graph">Show graph</button>		
 						</li>
@@ -131,7 +139,6 @@
 							<tr>
 								<td>
 									<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto">
-										
 									</div>
 								</td>
 							</tr>

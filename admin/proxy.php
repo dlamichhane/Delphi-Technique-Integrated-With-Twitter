@@ -6,12 +6,52 @@
 		header("Location: " . ADMIN_BASE_PATH . "/login.php");
 	}
 
-	if (isset($_POST['question']) && isset($_POST['round'])) {
-		require_once '../db.class.php';
+	require_once '../db.class.php';
 
-		$connection = new DBConnection();
-		$connection->db_connection();
-		$connection->selectDb();
+	$connection = new DBConnection();
+	$connection->db_connection();
+	$connection->selectDb();
+
+	if (isset($_POST['question']) && isset($_POST['round']) && isset($_POST['result_type']) && $_POST['result_type'] == 'comments') {
+		$question = "#" . $_POST['question'] . "_code";
+		$comment = "#" . $_POST['round']. "_comment";
+
+		$stm = "SELECT * FROM comments WHERE question_code='" . $question . "' AND comment_code='" . $comment . "'";
+		$rs = $connection->selectQuery($stm);
+
+		$tb = "<table class='table table-striped'>";
+		$tb .= "<thead>";
+		$tb .= "<tr>";
+		$tb .= "<th> Comments </th>";
+		$tb .= "<th> Question code </th>";
+		$tb .= "<th> Comment code </th>";
+		$tb .= "</tr>";
+		$tb .= "</thead>";
+		$tb .= "<tbody>";
+
+		if (count($rs) == count($rs, COUNT_RECURSIVE)) {
+			$tb .= "<tr>";
+			$tb .= "<td>" . $rs['comments'] . "</td>";
+			$tb .= "<td>" . $rs['question_code'] . "</td>";
+			$tb .= "<td>" . $rs['comment_code'] . "</td>";
+			$tb .= "</tr>";	
+		
+		} else {
+			foreach ($rs as $key => $value) {
+				$tb .= "<tr>";
+				$tb .= "<td>" . $value['comments'] . "</td>";
+				$tb .= "<td>" . $value['question_code'] . "</td>";
+				$tb .= "<td>" . $value['comment_code'] . "</td>";
+				$tb .= "</tr>";	
+			}	
+		}
+
+		$tb .= "</tbody>";
+		$tb .= "</table>";
+		echo  $tb ;
+		exit();
+
+	} else if (isset($_POST['question']) && isset($_POST['round']) && isset($_POST['result_type']) && $_POST['result_type'] == 'graph') {
 
 		$question = "#" . $_POST['question'] . "_code";
 		$round = "#" . $_POST['round']. "_answer";
