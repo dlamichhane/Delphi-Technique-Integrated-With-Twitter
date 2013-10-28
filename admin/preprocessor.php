@@ -35,8 +35,14 @@
 	</head>
 	<body>
 		<div class="container">
-			<a href="<?php echo ADMIN_BASE_PATH ?>/index.php"> Back to navigation</a>
-
+			<div class="row-fluid">
+				<div class="span6">
+					<a href="<?php echo ADMIN_BASE_PATH ?>/index.php"> Back to navigation</a>
+				</div>
+				<div class="span6">
+					<a style="float:right;" href="<?php echo ADMIN_BASE_PATH ?>/preprocessor.php"> Reset</a>
+				</div>
+			</div>	
 			<div class="row-fluid">
 				<div class="span12">
 					<ul style="text-align:center;list-style-type:none;">
@@ -44,6 +50,14 @@
 						<li><span class="label label-info">Round 1 => #R1_answer</span></li>
 						<li><span class="label label-info">Round 2 => #R2_answer</span></li>
 						<li><span class="label label-info">Round 3 => #R3_answer</span></li>
+						<?php 
+							if (! empty($_SESSION['res_insert'])) {
+								echo '<li><span class="label label-important">';
+								echo "<p>" . $_SESSION['res_insert'] ."</p>";
+								echo "</span></li>";
+								unset($_SESSION['res_insert']);
+							}
+						?>
 					</ul>
 				</div>
 			</div>
@@ -290,14 +304,14 @@
 						$connection->selectDb();
 						$stm = "SELECT * FROM questions";
 						$rs = $connection->selectQuery($stm);
-						// var_dump($rs);
+						
 						foreach ($rs as $key => $value) {
 							$res_str = '<tr>';
 							$res_str .=	'<td>' . ($key + 1).'</td>';
-							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . $value['question_code'] . '&round=R1_answer">Fetch response</a></td>';
-							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . $value['question_code'] . '&round=R2_answer">Fetch response</a></td>';
-							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . $value['question_code'] . '&round=R3_answer">Fetch response</a></td>';
-							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?comments=Q1_comments">Fetch comments</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . substr($value['question_code'], 1, strlen($value['question_code'])) . '&round=R1_answer">Fetch response</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . substr($value['question_code'], 1, strlen($value['question_code'])) . '&round=R2_answer">Fetch response</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="preprocessor.php?question=' . substr($value['question_code'], 1, strlen($value['question_code'])) . '&round=R3_answer">Fetch response</a></td>';
+							$res_str .=	'<td><a class="btn btn-large btn-primary" href="fetch_comment.php?question=' . substr($value['question_code'], 1, strlen($value['question_code'])) . '&comments=R3_comment">Fetch comments</a></td>';
 							$res_str .=	'<td>#Prepare_questions</td>';
 							$res_str .= '</tr>';
 							echo $res_str;

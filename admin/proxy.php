@@ -6,19 +6,19 @@
 		header("Location: " . ADMIN_BASE_PATH . "/login.php");
 	}
 
-	// if (isset($_POST['question']) && isset($_POST['round'])) {
+	if (isset($_POST['question']) && isset($_POST['round'])) {
 		require_once '../db.class.php';
 
 		$connection = new DBConnection();
 		$connection->db_connection();
 		$connection->selectDb();
 
-		// $question = "#" . $_POST['question'] . "_code";
-		// $round = "#" . $_POST['round']. "_answer";
-		$question = "#Q1_code";
-		$round = "#R1_answer";
-		// $result_code = $_POST['question'] . "_" . $_POST['round'];
-		$result_code = "Q1_R1";
+		$question = "#" . $_POST['question'] . "_code";
+		$round = "#" . $_POST['round']. "_answer";
+		// $question = "#Q1_code";
+		// $round = "#R1_answer";
+		$result_code = $_POST['question'] . "_" . $_POST['round'];
+		// $result_code = "Q1_R1";
 		
 		$stm = "SELECT 	SUM(answer_1) / COUNT(answer_1) AS option_1, SUM(answer_2) / COUNT(answer_2) AS option_2,
 						SUM(answer_3) / COUNT(answer_3) AS option_3, SUM(answer_4) / COUNT(answer_4) AS option_4,
@@ -229,7 +229,7 @@
 		array_push($response, json_encode($coff_var));
 		echo json_encode($response);
 		exit();
-	// }
+	}
 
 
 

@@ -69,7 +69,7 @@
 	/** Perform a GET request and echo the response **/
 	/** Note: Set the GET field BEFORE calling buildOauth(); **/
 	$url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
-	$getfield = '?screen_name=delphi_head&count=800&optional=true';
+	$getfield = '?screen_name=delphi_head&count=1&optional=true';
 	$requestMethod = 'GET';
 	$twitter = new TwitterAPIExchange($settings);
 	$response = json_decode($twitter->setGetfield($getfield)
@@ -81,13 +81,32 @@
 	$connection->selectDb();
 	
 	$a = array();
-	// echo "<ul>";
+	echo "<ul>";
 	foreach ($response as $key => $value) {
-		var_dump($value);
-		// echo "<li>" . $value->user->id . " - ". date('Y-m-d H:i:s',strtotime($value->created_at)) . " - ". $value->text ."</li>";
+		echo "<li>" . $value->user->id . " - ". date('Y-m-d H:i:s',strtotime($value->created_at)) . " - ". $value->text ."</li>";
 	}
-	// echo "</ul>";
+	echo "</ul>";
+	// $twitter = new TwitterAPIExchange($settings);
+	// foreach ($response as $k => $v) {
+	// 	$destroy_url = "https://api.twitter.com/1.1/statuses/destroy/" . $v->id_str. ".json";
+	// 	$requestMethod = 'POST';
+	// 	$postfields = array('id' => $v->id);
+
+	// 	$json =  $twitter->buildOauth($destroy_url, $requestMethod)
+ //                 ->setPostfields($postfields)
+ //                 ->performRequest();
+ //        var_dump(json_decode($json));
+ //       // die();
+
+	// }
+
 	die();	
+	
+
+
+
+
+
 	foreach ($response as $key => $value) {
 		
 		$tweet_created = date('Y-m-d H:i:s',strtotime($value->created_at));

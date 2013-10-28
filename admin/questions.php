@@ -112,8 +112,8 @@
 					<ul style="text-align:center;list-style-type:none;">
 						<li><span class="label label-info">NOTE!!! Respective hashtag should be used to reply the answer in each round</span></li>
 						<li><span class="label label-info">Round 1 => #R1_answer</span></li>
-						<li><span class="label label-info">Round 2 => #R2_answer</span></li>
-						<li><span class="label label-info">Round 3 => #R3_answer</span></li>
+						<li><span class="label label-info">Round 2 => #R2_answer </span></li>
+						<li><span class="label label-info">Round 3 => #R3_answer, #R3_comment</span></li>
 						
 							 <?php 
 								if (! empty($_SESSION['no_feedback'])) {
@@ -258,6 +258,7 @@
 							</thead>
 							<tbody>
 							<?php 
+
 								$stm = "SELECT * FROM questions";
 								$connection = new DBConnection();
 								$connection->db_connection();
@@ -302,7 +303,7 @@
 									<td></td>
 									<td><a class="btn btn-small btn-primary" href="tweet.php?action=tweet_q&question=<?php echo $row['id'];?>">Tweet Question</a></td>
 									<td><a class="btn btn-small btn-primary" href="tweet.php?action=tweet_o&question=<?php echo $row['id'];?>">Tweet Options</a></td>
-									<td></td>
+									<td><a class="btn btn-small btn-primary" href="tweet.php?action=tweet_c&question=<?php echo $row['id'];?>">Tweet comment</a></td>
 									<td><a class="btn btn-small btn-primary" href="tweet_feedback.php?round=R1&question=<?php echo $row['id'];?>">Round one feedback</a></td>
 									<td><a class="btn btn-small btn-primary" href="tweet_feedback.php?round=R2&question=<?php echo $row['id'];?>">Round two feedback</a></td>
 								</tr>

@@ -27,9 +27,13 @@
 		$connection->db_connection();
 		$connection->selectDb();
 
-		$stm = "SELECT question_code FROM questions WHERE id=" . $question_id;
+		$feedback_tweet_count = $_GET['round'] . '_feedback_tweet_count';
+
+		$stm = "SELECT question_code, " . $feedback_tweet_count . " FROM questions WHERE id=" . $question_id;
 		$question_code = $connection->selectQuery($stm);
 
+		$feedback_count = array_pop($question_code);
+		
 		$question_code_arr = explode('_', $question_code['question_code']);
 		$question_code = substr($question_code_arr[0], 1, 2);
 		$result_code = $question_code . "_" . $round;
@@ -49,11 +53,11 @@
 		$requestMethod = 'POST';
 
 		$postfields = array(
-		    'status' => 'POSTED',
+		    'status' => 'Feedback',
 		    'media[]' => "@{$img_path}"
 		);
 
-		// var_dump($postfields);
+		
 		/** Perform a POST request and echo the response **/
 		$twitter = new TwitterAPIExchange($settings);
 		$response = $twitter->buildOauth($url, $requestMethod)
@@ -63,6 +67,10 @@
 		
 		if (! empty($response->id)) {
 			$_SESSION['yes_feedback'] = "Feedback is tweeted";
+
+			$feedback_count = $feedback_count + 1;
+			$stm = "UPDATE questions SET " . $feedback_tweet_count . "=" . $feedback_count . " WHERE id=" . $_GET['question'];
+			$connection->createQuery($stm);
 		}
 		header("Location: " . ADMIN_BASE_PATH . "/questions.php");
 		exit();
